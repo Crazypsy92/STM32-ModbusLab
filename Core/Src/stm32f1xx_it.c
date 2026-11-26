@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bsp_includes.h"
+#include "modbus_port.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -201,5 +202,8 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /* USER CODE BEGIN 1 */
-
+#if BSP_MODBUS_ENABLE
+void USART1_IRQHandler(void) { MbPort_UartIrq(); }
+void TIM3_IRQHandler(void) { MbPort_TimerIrq(); }
+#endif
 /* USER CODE END 1 */

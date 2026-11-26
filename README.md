@@ -4,11 +4,11 @@
 
 ## 当前状态
 
-**Stage 0：原工程基线导入，待本仓库独立编译和真机复验。**
+**Stage 1：裸机 Modbus RTU 初始实现及 TTL 接口已加入，待实际编译、烧录和上位机联调。**
 
 基线来源：[stm32f103-at24xx-i2c-bus](https://github.com/Crazypsy92/stm32f103-at24xx-i2c-bus/tree/8000521f62abc04d72417cac80e53ad82bf7c4bb)。原工程的驱动、外设配置和应用逻辑保持不变；本仓库已统一 CMake 工程名、构建目标与 CubeMX 工程文件名。原仓库不作修改。
 
-当前尚未新增 UART 驱动、Modbus 中间件或 RS-485 适配，也没有本项目的 Modbus 真机验收结果。
+已新增独立 C 协议层、USART1/TIM3 移植层及设备映射。默认 USB-TTL，RS-485 方向控制可选。尚无本项目真机验收结果。详见 [Modbus 接线、寄存器与测试说明](docs/modbus_rtu.md)。
 
 ## 硬件与技术路线
 
@@ -22,7 +22,7 @@
 | 既有外设 | SSD1306 OLED、AT24xx EEPROM、MultiButton、LED |
 | PC 测试端 | [VirtualEmbeddedLab](https://github.com/Crazypsy92/VirtualEmbeddedLab) |
 
-现有外设接线沿用原工程：I2C2 PB10/PB11，KEY1 PB12，KEY2 PB14，LED PC13（低电平有效）。UART 引脚、定时器和串口参数在后续阶段确认，避免与原外设冲突。
+现有外设接线沿用原工程：I2C2 PB10/PB11，KEY1 PB12，KEY2 PB14，LED PC13（低电平有效）。Modbus 使用 USART1 PA9/PA10、TIM3、115200 8E1、从站 1；PA8 预留 RS485 DE 与 /RE。
 
 ## 目录结构
 
@@ -48,7 +48,7 @@ cmake --build --preset Debug
 
 Debug 构建目标为 `STM32-ModbusLab`，预期固件和链接映射文件为 `build/Debug/STM32-ModbusLab.elf`、`build/Debug/STM32-ModbusLab.map`。Release 构建使用 `Release` 预设，输出位于 `build/Release/`。如从原 AT24xx 工程迁移本地构建目录，请清理旧 CMake 缓存后重新配置。
 
-工程名调整仅涉及构建与 CubeMX 项目标识，不改变芯片、时钟、引脚、驱动或应用逻辑。新命名后的实际编译与真机验证待执行。
+默认编译 Modbus 实验应用（`-DBSP_MODBUS_ENABLE=ON`，实际参数见下方文档）。原 I2C 自测应用保留，可通过 `-DBSP_MODBUS_ENABLE=OFF` 切换。UART/TIM3 由 BSP 初始化，不由 IOC 生成；不要重新生成覆盖用户代码。实际编译与真机验证待执行。
 
 ## 开发规划
 

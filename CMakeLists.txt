@@ -53,6 +53,9 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     BSP/Src/at24cxx.c
     BSP/Src/at24xx_port.c
     BSP/Src/app_test.c
+    BSP/Src/modbus.c
+    BSP/Src/modbus_port.c
+    BSP/Src/modbus_device.c
 )
 
 # Add include paths
@@ -76,6 +79,13 @@ if(BSP_I2C_BACKEND STREQUAL "HARD")
 else()
     message(STATUS "BSP IIC backend: SOFT (GPIO bit-bang, PB10/PB11)")
 endif()
+
+# Modbus profile (default) or original standalone I2C demonstration.
+option(BSP_MODBUS_ENABLE "Enable Modbus RTU application" ON)
+option(BSP_MODBUS_RS485 "Enable PA8 RS485 direction control" OFF)
+target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+    BSP_MODBUS_ENABLE=$<BOOL:${BSP_MODBUS_ENABLE}>
+    BSP_MODBUS_RS485=$<BOOL:${BSP_MODBUS_RS485}>)
 
 # Remove wrong libob.a library dependency when using cpp files
 list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_LIBRARIES ob)

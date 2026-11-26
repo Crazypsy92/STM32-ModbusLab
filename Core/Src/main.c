@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bsp_includes.h"
+#include "modbus_device.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -117,7 +118,14 @@ int main(void)
   (void)AT24XX_PortInit();
 
   /* 5. 测试模块：上电自测（OLED + EEPROM 读写）后进入交互测试主界面 */
+#if BSP_MODBUS_ENABLE
+  OLED_ShowString(&g_oled, 0, 0, "MODBUS RTU", OLED_8X16);
+  OLED_ShowString(&g_oled, 0, 16, "115200 8E1", OLED_8X16);
+  OLED_Update(&g_oled);
+  MbApp_Init();
+#else
   AppTest_Init();
+#endif
 
   /* USER CODE END 2 */
 
@@ -128,7 +136,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+#if BSP_MODBUS_ENABLE
+    MbApp_Poll();
+#else
     AppTest_Task();   /* 测试任务：按键扫描、事件处理、运行指示（内部按毫秒计时，非阻塞） */
+#endif
   }
   /* USER CODE END 3 */
 }
