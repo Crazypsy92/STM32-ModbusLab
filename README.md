@@ -1,29 +1,67 @@
 # STM32-ModbusLab
 
-基于 STM32 的 Modbus 真实硬件通信实验平台。以 STM32F103C8T6 裸机 LL 工程为起点，面向 UART TTL、后续 RS-485 的 Modbus RTU 移植、设备寄存器映射及硬件在环测试。
+基于 STM32 的 Modbus 真实硬件通信实验平台。以 STM32F103C8T6 裸机 LL 工程为起点，开展 UART TTL、Modbus RTU 中间件移植、实际设备数据交互及硬件在环测试，并按需扩展 RS-485。
 
 ## 当前状态
 
-**Stage 0：工程初始化。** 计划复用原 [AT24xx I2C 工程](https://github.com/Crazypsy92/stm32f103-at24xx-i2c-bus) 的源码、构建配置及外设驱动。当前尚未实现或验证 Modbus、UART 通信与 RS-485。
+**Stage 0：原工程基线导入，待本仓库独立编译和真机复验。**
+
+基线来源：[stm32f103-at24xx-i2c-bus](https://github.com/Crazypsy92/stm32f103-at24xx-i2c-bus/tree/8000521f62abc04d72417cac80e53ad82bf7c4bb)。除 README 外，完整保留原工程受版本控制的文件、目录及文件权限。原工程不作修改。
+
+当前尚未新增 UART 驱动、Modbus 中间件或 RS-485 适配，也没有本项目的 Modbus 真机验收结果。
 
 ## 硬件与技术路线
 
 | 项目 | 配置 |
 |---|---|
-| MCU | STM32F103C8T6 |
+| MCU | STM32F103C8T6，72 MHz |
 | 软件 | 裸机 + STM32 LL |
 | 构建 | CMake + Ninja + ARM GCC |
-| 第一阶段通信 | 3.3 V USB-TTL，UART 点对点 |
+| 首阶段通信 | 3.3 V USB-TTL，UART 点对点 |
 | 后续通信 | RS-485 半双工，按需接入收发器 |
-| 现有外设 | SSD1306 OLED、AT24xx EEPROM、MultiButton、LED |
-| 上位机 | [VirtualEmbeddedLab](https://github.com/Crazypsy92/VirtualEmbeddedLab)，作为独立测试端 |
+| 既有外设 | SSD1306 OLED、AT24xx EEPROM、MultiButton、LED |
+| PC 测试端 | [VirtualEmbeddedLab](https://github.com/Crazypsy92/VirtualEmbeddedLab) |
+
+现有外设接线沿用原工程：I2C2 PB10/PB11，KEY1 PB12，KEY2 PB14，LED PC13（低电平有效）。UART 引脚、定时器和串口参数在后续阶段确认，避免与原外设冲突。
+
+## 目录结构
+
+```text
+BSP/                   现有板级驱动、I2C 抽象、OLED、EEPROM、按键
+Core/                  STM32 启动、GPIO、中断及主程序
+Drivers/               CMSIS、STM32F1 LL 及原厂许可
+cmake/                 工具链及 CubeMX 构建配置
+CMakeLists.txt
+CMakePresets.json
+at24xx.ioc              原 CubeMX 配置
+TEST_REPORT.md         原工程历史测试记录
+```
+
+## 基线构建
+
+准备 CMake、Ninja 和 arm-none-eabi-gcc，在仓库根目录执行：
+
+```bash
+cmake --preset Debug
+cmake --build --preset Debug
+```
+
+Release 构建使用 `Release` 预设。现阶段保留原构建目标与 CubeMX 配置，暂不改名或修改源码。
 
 ## 开发规划
 
-1. 复用原工程，保持既有外设功能。
-2. 新增 UART 驱动并开展 TTL 真机收发验证。
-3. 移植 Modbus RTU 从站中间件，完成寄存器映射。
-4. 开展真实设备读写、异常恢复及稳定性测试。
-5. 按需扩展 DMA、RS-485 及 RTOS 移植。
+| 阶段 | 内容 |
+|---|---|
+| Stage 0 | 原工程导入、基线编译和真机复验 |
+| Stage 1 | UART LL 驱动与 TTL 真机收发 |
+| Stage 2 | 中断/DMA 收发、缓冲区与帧时序 |
+| Stage 3 | Modbus RTU 从站中间件移植 |
+| Stage 4 | OLED、EEPROM、按键和 LED 的设备寄存器映射 |
+| Stage 5 | 上位机联调及自动化硬件测试 |
+| Stage 6 | 压力测试、错误注入和异常恢复 |
+| Stage 7 | RS-485 物理层适配（按需） |
+| 后续可选 | MCU 主站、多节点、RTOS 移植、Modbus TCP |
 
-TTL 仅用于短距离点对点通信验证，不代表 RS-485 物理层已通过测试。原 I2C 工程历史验收不等同于本项目 Modbus 验收。
+TTL 测试使用匹配 MCU 的 3.3 V 逻辑电平、TX/RX 交叉连接及共地，仅证明点对点 UART 与 RTU 通信能力；不能替代 RS-485 物理层、电气时序及工业环境验证。
+
+原 [TEST_REPORT.md](TEST_REPORT.md) 仅作为导入基线的历史记录，不代表本项目已通过 Modbus 验收。第三方驱动许可保留在原目录。
