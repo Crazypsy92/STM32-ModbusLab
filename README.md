@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-**Stage 1：裸机 Modbus RTU 初始实现及 TTL 接口已加入，待实际编译、烧录和上位机联调。**
+**Stage 1：裸机 Modbus RTU 初始实现及 TTL 接口已加入，独立 Host 协议测试通过，待 ARM 编译、烧录和上位机联调。**
 
 基线来源：[stm32f103-at24xx-i2c-bus](https://github.com/Crazypsy92/stm32f103-at24xx-i2c-bus/tree/8000521f62abc04d72417cac80e53ad82bf7c4bb)。原工程的驱动、外设配置和应用逻辑保持不变；本仓库已统一 CMake 工程名、构建目标与 CubeMX 工程文件名。原仓库不作修改。
 

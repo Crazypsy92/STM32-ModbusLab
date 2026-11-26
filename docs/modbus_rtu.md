@@ -60,8 +60,8 @@ cmake --build --preset Debug
 
 ## 上位机
 
-VirtualEmbeddedLab 在 WSL2 运行 `python3 scripts/vel.py dashboard`，选择 Modbus → Modbus RTU → 连接/传输配置 → Serial 设备，关闭 native_sim PTY 选项，选择实际 /dev/ttyUSB0 或 /dev/ttyACM0（由系统枚举确定），填 115200/8/E/1、读写超时 0.15 s，先测试 FC03，HR0 初始值 1。通过 FC05 写 Coil0 后 FC01 与 IR7 回读，再物理观察 LED；FC02 观察真实按键。上位机仿真专用故障注入和 DI 刺激不能用于实物模式。
+VirtualEmbeddedLab 在 WSL2 运行 `python3 scripts/vel.py dashboard`，选择 Modbus → Modbus RTU → 连接/传输配置 → Serial 设备，点击 STM32-ModbusLab · TTL 预设（或手动关闭 native_sim PTY 选项），选择实际 /dev/ttyUSB0 或 /dev/ttyACM0（由系统枚举确定），填 115200/8/E/1、读写超时 0.15 s，先测试 FC03，HR0 初始值 1。通过 FC05 写 Coil0 后 FC01 与 IR7 回读，再物理观察 LED；FC02 观察真实按键。上位机仿真专用故障注入和 DI 刺激不能用于实物模式。
 
 ## 验收边界
 
-目前源码与配置已提交，ARM 编译、Host 单测、TTL 实际通信、真实串口时序、RS485 均待测试。初始 RTU 核心限定 8 个功能码，不是完整通用 Modbus 栈认证；不宣称生产环境可靠性。后续优先验证旧 profile 编译、Modbus profile 编译、接线、FC03、FC05、FC02、连续收发，再测试异常及定时边界。
+源码与配置已提交。独立 Host 协议测试已用 GCC、-Wall -Wextra -Werror、ASan 和 UBSan 编译运行通过；三份测试源码的 Git blob SHA 与提交 b14ad7f 一致。ARM 编译、TTL 实际通信、真实串口时序、RS485 仍待测试。初始 RTU 核心限定 8 个功能码，不是完整通用 Modbus 栈认证；不宣称生产环境可靠性。后续优先验证旧 profile 编译、Modbus profile 编译、接线、FC03、FC05、FC02、连续收发，再测试异常及定时边界。
