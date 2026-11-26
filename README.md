@@ -6,7 +6,7 @@
 
 **Stage 0：原工程基线导入，待本仓库独立编译和真机复验。**
 
-基线来源：[stm32f103-at24xx-i2c-bus](https://github.com/Crazypsy92/stm32f103-at24xx-i2c-bus/tree/8000521f62abc04d72417cac80e53ad82bf7c4bb)。除 README 外，完整保留原工程受版本控制的文件、目录及文件权限。原工程不作修改。
+基线来源：[stm32f103-at24xx-i2c-bus](https://github.com/Crazypsy92/stm32f103-at24xx-i2c-bus/tree/8000521f62abc04d72417cac80e53ad82bf7c4bb)。原工程的驱动、外设配置和应用逻辑保持不变；本仓库已统一 CMake 工程名、构建目标与 CubeMX 工程文件名。原仓库不作修改。
 
 当前尚未新增 UART 驱动、Modbus 中间件或 RS-485 适配，也没有本项目的 Modbus 真机验收结果。
 
@@ -33,7 +33,7 @@ Drivers/               CMSIS、STM32F1 LL 及原厂许可
 cmake/                 工具链及 CubeMX 构建配置
 CMakeLists.txt
 CMakePresets.json
-at24xx.ioc              原 CubeMX 配置
+STM32-ModbusLab.ioc     CubeMX 配置（原硬件参数保持不变）
 TEST_REPORT.md         原工程历史测试记录
 ```
 
@@ -46,7 +46,9 @@ cmake --preset Debug
 cmake --build --preset Debug
 ```
 
-Release 构建使用 `Release` 预设。现阶段保留原构建目标与 CubeMX 配置，暂不改名或修改源码。
+Debug 构建目标为 `STM32-ModbusLab`，预期固件和链接映射文件为 `build/Debug/STM32-ModbusLab.elf`、`build/Debug/STM32-ModbusLab.map`。Release 构建使用 `Release` 预设，输出位于 `build/Release/`。如从原 AT24xx 工程迁移本地构建目录，请清理旧 CMake 缓存后重新配置。
+
+工程名调整仅涉及构建与 CubeMX 项目标识，不改变芯片、时钟、引脚、驱动或应用逻辑。新命名后的实际编译与真机验证待执行。
 
 ## 开发规划
 
@@ -64,4 +66,4 @@ Release 构建使用 `Release` 预设。现阶段保留原构建目标与 CubeMX
 
 TTL 测试使用匹配 MCU 的 3.3 V 逻辑电平、TX/RX 交叉连接及共地，仅证明点对点 UART 与 RTU 通信能力；不能替代 RS-485 物理层、电气时序及工业环境验证。
 
-原 [TEST_REPORT.md](TEST_REPORT.md) 仅作为导入基线的历史记录，不代表本项目已通过 Modbus 验收。第三方驱动许可保留在原目录。
+原 [TEST_REPORT.md](TEST_REPORT.md) 仅作为导入基线的历史记录，其中 `at24xx` 工程名和旧产物路径保留原样，不代表当前工程命名或本项目已通过 Modbus 验收。第三方驱动许可保留在原目录。
